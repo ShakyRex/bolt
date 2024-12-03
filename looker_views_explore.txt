@@ -1,0 +1,270 @@
+# customer.view.lkml
+
+view: customer {
+# view containing AirBolt customers' data
+# 2024/12/01 Giacomo Federle
+  sql_table_name: customer;;
+
+  dimension: customer_id {
+    primary_key: yes
+    type: number
+    sql: ${TABLE}.customer_id;;
+  }
+
+  dimension: name {
+    type: string
+    sql: ${TABLE}.name;;
+    label: "Customer name"
+  }
+
+  dimension: customer_group_id {
+    type: number
+    sql: ${TABLE}.customer_group_id;;
+    hidden: yes
+  }
+
+  dimension: email {
+    type: string
+    sql: ${TABLE}.email;;
+  }
+
+  dimension: phone_number {
+    type: string
+    sql: ${TABLE}.phone_number;;
+  }
+}
+
+# customer_group.view.lkml
+
+view: customer_group {
+# view containing AirBolt customer_group' data
+# 2024/12/01 Giacomo Federle
+  sql_table_name: customer_group;;
+
+  dimension: id {
+    primary_key: yes
+    type: number
+    sql: ${TABLE}.id;;
+    hidden: "yes"
+  }
+
+  dimension: type {
+    type: string
+    sql: ${TABLE}."type";;
+    label: "Customer type"
+    description: "describe the customer nature or entity"
+  }
+
+  dimension: name {
+    type: string
+    sql: ${TABLE}.name;;
+    label: "Customer group name"
+  }
+
+  dimension: registry_number {
+    type: string
+    sql: ${TABLE}.registry_number ;;
+  }
+}
+
+# aeroplane.view.lkml
+
+view: aeroplane {
+# view containing AirBolt aeroplanes data
+# 2024/12/01 Giacomo Federle
+  sql_table_name: aeroplane;;
+
+  dimension: aeroplane_id {
+    primary_key: yes
+    type: number
+    sql: ${TABLE}.aeroplane_id ;;
+  }
+
+  dimension: aeroplane_model {
+    type: string
+    sql: ${TABLE}.aeroplane_model ;;
+  }
+
+  dimension: manufacturer {
+    type: string
+    sql: ${TABLE}.manufacturer ;;
+  }
+}
+
+# trip.view.lkml
+
+view: trip {
+# view containing AirBolt trips data
+# 2024/12/01 Giacomo Federle
+  sql_table_name: trip;;
+
+  dimension: trip_id {
+    primary_key: yes
+    type: number
+    sql: ${TABLE}.trip_id;;
+    hidden: yes
+  }
+
+  dimension: origin_city {
+    type: string
+    sql: ${TABLE}.origin_city ;;
+  }
+
+  dimension: destination_city {
+    type: string
+    sql: ${TABLE}.destination_city ;;
+  }
+
+  dimension: airplane_id {
+    type: number
+    sql: ${TABLE}.airplane_id ;;
+    hidden:yes
+  }
+
+  dimension_group: start_timestamp {
+    type: time
+    sql: ${TABLE}.start_timestamp ;;
+  }
+
+  dimension_group: end_timestamp {
+    type: time
+    sql: ${TABLE}.end_timestamp ;;
+  }
+
+    dimension: trip_duration {
+    type: duration
+    intervals: [hour]
+    sql_start: ${start_timestamp_raw}
+    sql_end: ${end_timestamp_raw}
+    datatype: hour
+  }
+}
+
+# order.view.lkml
+
+view: order {
+# view containing AirBolt orders data
+# 2024/12/01 Giacomo Federle
+  sql_table_name: "order" ;;
+
+  dimension: order_id {
+    primary_key: yes
+    type: number
+    sql: ${TABLE}.order_id ;;
+    hidden: yes
+  }
+
+  dimension: customer_id {
+    type: number
+    sql: ${TABLE}.customer_id ;;
+    hidden: yes
+  }
+
+  dimension: trip_id {
+    type: number
+    sql: ${TABLE}.trip_id ;;
+    hidden: yes
+  }
+
+  dimension: price_ {
+    type: number
+    sql: ${TABLE}.price ;;
+    hidden: yes
+  }
+
+  dimension: seat_number {
+    type: string
+    sql: ${TABLE}.seat_number ;;
+  }
+
+  dimension: status {
+    type: string
+    sql: ${TABLE}.status ;;
+  }
+
+  measure: price
+  sql: ${price}
+  type: sum
+  value_format_name: eur
+}
+
+# aeroplane_model.view.lkml
+
+view: aeroplane_model {
+# view containing AirBolt aeroplanes model data
+# 2024/12/01 Giacomo Federle
+  sql_table_name: aeroplane_model ;;
+
+  dimension: aeroplane_model {
+    primary_key: yes
+    type: string
+    sql: ${TABLE}.aeroplane_model ;;
+  }
+
+  dimension: producer {
+    type: string
+    sql: ${TABLE}.producer ;;
+    label: "Aeroplane producer
+  }
+
+  dimension: max_seats {
+    type: number
+    sql: ${TABLE}.max_seats ;;
+    label: "Max number of seats"
+  }
+
+  dimension: max_weight {
+    type: number
+    sql: ${TABLE}.max_weight ;;
+    description: "Max carrying capacity in kg"
+  }
+
+  dimension: max_distance {
+    type: number
+    sql: ${TABLE}.max_distance ;;
+    description: "Max distance before refueling"
+  }
+
+  dimension: engine_type {
+    type: string
+    sql: ${TABLE}.engine_type ;;
+  }
+}
+
+# explore.lkml
+
+explore: order {
+# view containing AirBolt orders data
+# 2024/12/01 Giacomo Federle
+    label: "Orders details"
+    description: "Explore containing order, customer, trip and aeroplane details"
+  join: customer {
+    view_label: "Customers"
+    sql_on: ${order.customer_id} = ${customer.customer_id} ;;
+    relationship: many_to_one
+  }
+
+  join: trip {
+    view_label: "Trips"
+    sql_on: ${order.trip_id} = ${trip.trip_id} ;;
+    relationship: many_to_one
+  }
+
+  join: customer_group {
+    view_label: "Customer groups"
+    sql_on: ${customer.customer_group_id} = ${customer_group.id} ;;
+    relationship: many_to_one
+  }
+
+  join: aeroplane {
+    view_label: "Aeroplanes details"
+    sql_on: ${trip.airplane_id} = ${aeroplane.aeroplane_id} ;;
+    relationship: many_to_one
+  }
+
+  join: aeroplane_model {
+    view_label: "Aeroplane details"
+    sql_on: ${aeroplane.aeroplane_model} = ${aeroplane_model.aeroplane_model} ;;
+    relationship: many_to_one
+  }
+}
