@@ -16,9 +16,12 @@ Not knowing much about the business context and about how the data is produced, 
 This approach was for sure influenced by my newly acquired dbt fundamentals certification.
 
 ### comments on what would you do if you had more time for the task
-The first thing I would do, having more time for the task, is to gather more context about the business and technical setup, in particular about the data production process and the needs of the stakeholders at the end of the pipeline. This knowledge might have led to different choices, mostly around whether to enforce constraints at the database level or to keep the tests in dbt. This would have also given me a better idea of what metrics are needed in Looker, and it would have helped in considering future scenarios and edge cases.
-I would have also added 2 more singular tests for the customer table, using regex to make sure that the email addresses are actually email addresses and that the phone numbers are phone numbers (trickier since the length of phone numbers varies a lot globally).
-I would have also set up the freshness parameters in dbt. And lastly, I would have addressed possible data GDPR concerns about keeping non-anonymized customer data.
+- The first thing I would do, having more time for the task, is to gather more context about the business and technical setup, in particular about the data production process and the needs of the stakeholders at the end of the pipeline. This knowledge might have led to different choices, mostly around whether to enforce constraints at the database level or to keep the tests in dbt. 
+- This would have also given me a better idea of what metrics are needed in Looker, and it would have helped in considering future scenarios and edge cases.
+- I would have also added 2 more singular tests for the customer table, using regex to make sure that the email addresses are actually email addresses and that the phone numbers are phone numbers (trickier since the length of phone numbers varies a lot globally). 
+- I would have addressed the json aeroplane file ingestion through a python script. 
+- I would have also set up the freshness parameters in dbt.
+- And lastly, I would have addressed possible data GDPR concerns about keeping non-anonymized customer data.
 
 ## Part 2
 ### How would you envision the ideal CI/CD process to implement these changes over time? What kind of environments, processes, tests, and tools might be involved?
