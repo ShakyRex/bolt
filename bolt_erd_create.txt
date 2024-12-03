@@ -1,0 +1,54 @@
+table customer {
+  customer_id integer [primary key, note: 'unique customer id']
+  name varchar
+  customer_group_id integer [note: 'foreign key for the customer_group table, nullable if no group']
+  email varchar [note: 'email address of the customer, nullable if no email']
+  phone_number varchar
+}
+
+table customer_group {
+  id integer [primary key, note: 'unique group id']
+  type varchar
+  name varchar
+  registry_number bigint [note: 'if registry numbers can have leading zero, this should be vchar']
+}
+
+table aeroplane {
+  aeroplane_id integer [primary key, note: 'unique aeroplane id']
+  aeroplane_model varchar [note: 'foreign key for aeroplane_model table']
+  manufacturer varchar
+}
+
+table trip {
+  trip_id integer [primary key, note: 'unique trip id']
+  origin_city varchar
+  destination_city varchar
+  airplane_id integer [note: 'foreign key for aeroplane table']
+  start_timestamp timestamp
+  end_timestamp timestamp
+}
+
+table order {
+  order_id integer [primary key, note: 'unique order id']
+  customer_id integer [note: 'foreign key for customer table']
+  trip_id integer [note: 'foreign key for trip table']
+  price float
+  seat_number varchar
+  status varchar
+}
+
+table aeroplane_model {
+  producer varchar
+  aeroplane_model varchar [primary key, note: 'unique id for the aeroplane model']
+  max_seats integer
+  max_weight integer
+  max_distance integer
+  engine_type varchar
+}
+
+
+ref: customer.customer_group_id > customer_group.id // many-to-one
+ref: aeroplane.aeroplane_model > aeroplane_model.aeroplane_model // many-to-one
+ref: trip.airplane_id > aeroplane.aeroplane_id // many-to-one
+ref: order.customer_id > customer.customer_id // many-to-one
+ref: order.trip_id > trip.trip_id // many-to-one
